@@ -39,7 +39,7 @@ This separation of concerns makes the system robust. For example, the `Blockchai
 
 The script runs a continuous simulation loop, with each iteration representing a single processing cycle. Here's a step-by-step breakdown:
 
-1.  **Initialization**: The main script block instantiates all the necessary classes (`BlockchainConnector` for both chains, `EventScanner`, `TransactionValidator`, and the main `CrossChainProcessor`).
+1.  **Initialization**: The script starts by instantiating all the necessary classes: `BlockchainConnector` for both chains, `EventScanner`, `TransactionValidator`, and the main `CrossChainProcessor`.
 
 2.  **Start Cycle**: The `CrossChainProcessor` begins a cycle. It first ensures it can connect to both the source and destination chains.
 
@@ -55,7 +55,9 @@ The script runs a continuous simulation loop, with each iteration representing a
 
 8.  **Wait**: The script waits for a few seconds before starting the next cycle, mimicking the polling interval of a real-world listener.
 
-## Usage Example
+## Usage
+
+### Running the Simulation
 
 Follow these steps to run the simulation.
 
@@ -97,7 +99,7 @@ You will see a detailed log of the simulation's activity, showing each step of t
 2023-10-27 10:30:00 - INFO - [BlockchainConnector] - Successfully connected to SourceChain node.
 2023-10-27 10:30:00 - INFO - [BlockchainConnector] - Successfully connected to DestinationChain node.
 2023-10-27 10:30:00 - INFO - [CrossChainProcessor] - [SIMULATION] Found 1 mock 'DepositInitiated' event in block 1000002.
-2023-10-27 10:30:00 - INFO - [TransactionValidator] - Validating deposit from transaction 0x... ...
+2023-10-27 10:30:00 - INFO - [TransactionValidator] - Validating deposit from transaction 0x...
 2023-10-27 10:30:00 - INFO - [TransactionValidator] - Simulated API check for 0x...: Call to https://api.mock-source-scan.io/api successful.
 2023-10-27 10:30:00 - INFO - [TransactionValidator] - Validation PASSED for transaction 0x...
 2023-10-27 10:30:00 - INFO - [CrossChainProcessor] - Preparing to mint 15000.0 tokens for 0xRecipient0202... on destination chain.
@@ -106,4 +108,42 @@ You will see a detailed log of the simulation's activity, showing each step of t
 2023-10-27 10:30:00 - INFO - [CrossChainProcessor] - Cycle finished. Next scan will start from block 1000011.
 
 ... (The simulation continues for a few more cycles)
+```
+
+### Core Logic Snippet
+
+The core of the simulation's setup in `script.py` demonstrates how the different architectural components are wired together:
+
+```python
+if __name__ == "__main__":
+    # 1. Initialize connectors for source and destination chains
+    source_chain_connector = BlockchainConnector(
+        chain_name="SourceChain",
+        rpc_url="https://mock.source.rpc"
+    )
+    dest_chain_connector = BlockchainConnector(
+        chain_name="DestinationChain",
+        rpc_url="https://mock.dest.rpc"
+    )
+
+    # 2. Set up the event scanner for the source chain
+    event_scanner = EventScanner(source_chain_connector)
+
+    # 3. Initialize the transaction validator with its rules
+    validator = TransactionValidator(
+        api_endpoint="https://api.mock-source-scan.io/api",
+        min_amount=100,
+        max_amount=100000
+    )
+
+    # 4. Create the main processor to orchestrate the workflow
+    processor = CrossChainProcessor(
+        source_connector=source_chain_connector,
+        dest_connector=dest_chain_connector,
+        event_scanner=event_scanner,
+        validator=validator
+    )
+
+    # 5. Run the simulation loop
+    processor.run_simulation(start_block=1000000, cycles=5)
 ```
