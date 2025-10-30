@@ -2,7 +2,7 @@
 
 This repository contains a Python-based simulation of a crucial off-chain component for a cross-chain bridge. It acts as a "relayer" or "validator node" that listens for events on a source blockchain and triggers corresponding actions on a destination blockchain.
 
-The script's architecture demonstrates key software design principles like separation of concerns, error handling, and interaction with external services, all within a simulated environment.
+This project's architecture demonstrates key software design principles like separation of concerns, error handling, and interaction with external services, all within a simulated environment.
 
 ## Concept
 
@@ -23,12 +23,12 @@ The script is designed with a modular, class-based architecture to ensure clarit
 
 -   `EventScanner`: Its sole purpose is to scan a given range of blocks on a blockchain for a specific event from a specific smart contract. It uses a `BlockchainConnector` to communicate with the node.
 
--   `TransactionValidator`: This component performs off-chain validation checks on a detected event. This is where business logic and security rules are enforced. In this simulation, it checks:
+-   `TransactionValidator`: This component performs off-chain validation checks on a detected event. This is where business logic and security rules, such as deposit limits, are enforced. In this simulation, it checks:
     -   If the deposit amount is within acceptable limits.
     -   If the destination chain is supported.
     -   **(Simulated)** It makes an API call using the `requests` library to a mock block explorer to verify the transaction's finality.
 
--   `CrossChainProcessor`: This is the main orchestrator. It ties all the other components together. It maintains the state of the listener (e.g., the last block it scanned) and controls the overall workflow:
+-   `CrossChainProcessor`: This class is the main orchestrator. It orchestrates the entire process, tying the other components together. It maintains the state of the listener (e.g., the last block it scanned) and controls the overall workflow:
     1.  Uses the `EventScanner` to find new events.
     2.  For each event, it uses the `TransactionValidator` to verify it.
     3.  If valid, it simulates the creation, signing, and submission of a `mint` transaction on the destination chain using the `BlockchainConnector`.
@@ -63,8 +63,8 @@ Follow these steps to run the simulation.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/scale.git
-    cd scale
+    git clone <repository-url>
+    cd <repository-name>
     ```
 
 2.  **Create and activate a virtual environment (recommended):**
@@ -95,22 +95,22 @@ You will see a detailed log of the simulation's activity, showing each step of t
 ===   Cross-Chain Bridge Event Listener Simulation   ===
 ==========================================================
 
-<TIMESTAMP> - INFO - [CrossChainProcessor] - --- Starting new processing cycle --- 
-<TIMESTAMP> - INFO - [BlockchainConnector] - Successfully connected to SourceChain node.
-<TIMESTAMP> - INFO - [BlockchainConnector] - Successfully connected to DestinationChain node.
-<TIMESTAMP> - INFO - [CrossChainProcessor] - [SIMULATION] Found 1 mock 'DepositInitiated' event in block 1000002.
-<TIMESTAMP> - INFO - [TransactionValidator] - Validating deposit from transaction 0x...
-<TIMESTAMP> - INFO - [TransactionValidator] - Simulated API check for 0x...: Call to https://api.mock-source-scan.io/api successful.
-<TIMESTAMP> - INFO - [TransactionValidator] - Validation PASSED for transaction 0x...
-<TIMESTAMP> - INFO - [CrossChainProcessor] - Preparing to mint 15000.0 tokens for 0xRecipient0202... on destination chain.
-<TIMESTAMP> - INFO - [CrossChainProcessor] - Source Tx Hash for proof: 0x...
-<TIMESTAMP> - INFO - [CrossChainProcessor] - [SIMULATION] Mint transaction successfully submitted. Destination Tx Hash: 0x...
-<TIMESTAMP> - INFO - [CrossChainProcessor] - Cycle finished. Next scan will start from block 1000011.
+2023-10-27 10:30:00,123 - INFO - [CrossChainProcessor] - --- Starting new processing cycle --- 
+2023-10-27 10:30:00,124 - INFO - [BlockchainConnector] - Successfully connected to SourceChain node.
+2023-10-27 10:30:00,125 - INFO - [BlockchainConnector] - Successfully connected to DestinationChain node.
+2023-10-27 10:30:00,126 - INFO - [CrossChainProcessor] - [SIMULATION] Found 1 mock 'DepositInitiated' event in block 1000002.
+2023-10-27 10:30:00,127 - INFO - [TransactionValidator] - Validating deposit from transaction 0xabc...
+2023-10-27 10:30:00,450 - INFO - [TransactionValidator] - Simulated API check for 0xabc...: Call to https://api.mock-source-scan.io/api successful.
+2023-10-27 10:30:00,451 - INFO - [TransactionValidator] - Validation PASSED for transaction 0xabc...
+2023-10-27 10:30:00,452 - INFO - [CrossChainProcessor] - Preparing to mint 15000.0 tokens for 0xRecipient0202... on destination chain.
+2023-10-27 10:30:00,453 - INFO - [CrossChainProcessor] - Source Tx Hash for proof: 0xabc...
+2023-10-27 10:30:00,454 - INFO - [CrossChainProcessor] - [SIMULATION] Mint transaction successfully submitted. Destination Tx Hash: 0xdef...
+2023-10-27 10:30:00,455 - INFO - [CrossChainProcessor] - Cycle finished. Next scan will start from block 1000011.
 
 ... (The simulation continues for a few more cycles)
 ```
 
-### Core Logic Snippet
+### Core Component Setup
 
 The core of the simulation's setup in `script.py` demonstrates how the different architectural components are wired together:
 
